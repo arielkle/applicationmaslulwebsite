@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>טכנופדגוגיה, בינה והערכה - אריאל קלפנר</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Babel (כדי שהדפדפן יבין את קוד ה-React) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // --- אייקונים (מחליפים את ספריית Lucide עבור קובץ HTML בודד) ---
+        const VideoIcon = ({ className, size = 24 }) => (
+          <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+        );
+        const LayoutTemplateIcon = ({ className, size = 24 }) => (
+          <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="7" x="3" y="3" rx="1"/><rect width="9" height="7" x="3" y="14" rx="1"/><rect width="5" height="7" x="16" y="14" rx="1"/></svg>
+        );
+        const PresentationIcon = ({ className, size = 24 }) => (
+          <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/></svg>
+        );
+        const LinkIconComponent = ({ className, size = 24 }) => (
+          <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        );
+        const ExternalLinkIcon = ({ className, size = 24 }) => (
+          <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+        );
+
+        // --- האפליקציה המרכזית ---
+        function App() {
+          const [activePage, setActivePage] = useState(1);
+          
+          const [imgExtIndex, setImgExtIndex] = useState(0);
+          const extensions = ['jpg', 'png', 'jpeg', 'gif', 'webp'];
+          const directUrl = `https://i.ibb.co/tMVkTf5p/image.${extensions[imgExtIndex]}`;
+
+          const navItems = [
+            { id: 1, title: 'יצירת מסלול למידה', icon: <VideoIcon className="w-4 h-4" />, color: 'hover:bg-green-200 text-green-900', activeColor: 'bg-green-300 shadow-md font-bold' },
+            { id: 2, title: 'העברה ל- Google Sites', icon: <LayoutTemplateIcon className="w-4 h-4" />, color: 'hover:bg-orange-200 text-orange-900', activeColor: 'bg-orange-300 shadow-md font-bold' },
+            { id: 3, title: 'העברה ל- Google Slides', icon: <PresentationIcon className="w-4 h-4" />, color: 'hover:bg-purple-200 text-purple-900', activeColor: 'bg-purple-300 shadow-md font-bold' }
+          ];
+
+          return (
+            <div dir="rtl" className="min-h-screen font-sans bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 text-gray-800 pb-16">
+              
+              {/* Navigation Menu */}
+              <nav className="bg-white/70 backdrop-blur-md shadow-sm sticky top-0 z-50 p-4 border-b border-white/50">
+                <div className="container mx-auto flex justify-center">
+                  <ul className="flex flex-wrap justify-center gap-2 md:gap-4">
+                    {navItems.map((item) => (
+                      <li key={item.id}>
+                        <button
+                          onClick={() => setActivePage(item.id)}
+                          className={`flex items-center gap-2 px-5 py-2.5 rounded-full transition-all duration-300 ${
+                            activePage === item.id ? item.activeColor : `bg-white/60 ${item.color}`
+                          }`}
+                        >
+                          {item.icon}
+                          <span>{item.title}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </nav>
+
+              <main className="container mx-auto px-4 mt-10 max-w-5xl">
+                
+                {/* Global Header */}
+                <header className="flex flex-col items-center text-center mb-12">
+                  <h1 className="text-4xl md:text-5xl font-extrabold text-purple-800 mb-2 drop-shadow-sm">
+                    טכנופדגוגיה, בינה והערכה
+                  </h1>
+                  <h2 className="text-2xl md:text-3xl font-semibold text-pink-600 mb-8 drop-shadow-sm">
+                    עם אריאל קלפנר
+                  </h2>
+                  
+                  {/* Header Image */}
+                  <div className="relative group w-full max-w-md flex justify-center">
+                    {imgExtIndex < extensions.length ? (
+                      <img 
+                        src={directUrl} 
+                        alt="טכנופדגוגיה בינה והערכה" 
+                        className="max-w-xs md:max-w-md rounded-3xl shadow-xl border-4 border-white object-cover"
+                        onError={() => setImgExtIndex(prev => prev + 1)}
+                      />
+                    ) : (
+                      <div className="bg-blue-100/80 border-2 border-blue-200 p-8 rounded-3xl text-center shadow-lg w-full">
+                        <p className="text-blue-900 mb-4 font-medium">לא הצלחנו לטעון את התמונה ישירות מהקישור.</p>
+                        <a 
+                          href="https://ibb.co/tMVkTf5p" 
+                          target="_blank" 
+                          rel="noreferrer" 
+                          className="inline-flex items-center gap-2 bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-6 rounded-full transition-colors"
+                        >
+                          <LinkIconComponent size={18} />
+                          לחץ כאן לצפייה בתמונה
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </header>
+
+                {/* Page Content Rendering */}
+                <div className="bg-white/40 backdrop-blur-lg border border-white/60 rounded-3xl p-6 md:p-10 shadow-2xl">
+                  
+                  {/* Page 1 */}
+                  {activePage === 1 && (
+                    <div className="flex flex-col items-center animate-in fade-in zoom-in duration-500">
+                      <h3 className="text-3xl font-bold text-center mb-8 text-blue-900 bg-blue-100 px-6 py-2 rounded-full inline-block">
+                        סרטון ראשון : יצירת מסלול למידה
+                      </h3>
+                      
+                      <div className="flex flex-col items-center w-full mb-12">
+                        <div className="w-full max-w-3xl aspect-video rounded-2xl overflow-hidden shadow-xl bg-gray-900 border-4 border-blue-100">
+                          <iframe 
+                            className="w-full h-full" 
+                            src="https://www.youtube.com/embed/r7KcgWKO-lA" 
+                            title="YouTube video player" 
+                            frameBorder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowFullScreen>
+                          </iframe>
+                        </div>
+                      </div>
+
+                      <h4 className="text-2xl font-semibold mb-4 text-green-800">דוגמה לאפליקציה המוגמרת</h4>
+                      <p className="text-center text-gray-600 mb-4 max-w-2xl">כאן תוכלו לראות את האפליקציה שהוצגה בסרטון. אם היא לא מופיעה מסיבות אבטחה של הדפדפן, ניתן לפתוח אותה בחלון חדש.</p>
+                      
+                      <div className="w-full max-w-4xl h-[500px] rounded-2xl overflow-hidden shadow-lg border-4 border-green-200 mb-6 bg-white relative">
+                        <iframe 
+                          className="w-full h-full" 
+                          src="https://arielkle.github.io/learning_path/" 
+                          title="Learning Path App" 
+                          frameBorder="0">
+                        </iframe>
+                      </div>
+                      
+                      <a 
+                        href="https://arielkle.github.io/learning_path/" 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="inline-flex items-center gap-2 bg-green-200 hover:bg-green-300 text-green-900 font-bold py-3 px-8 rounded-full transition-all shadow-md hover:shadow-lg transform hover:-translate-y-1"
+                      >
+                        <span>פתח אפליקציה בחלון חדש</span>
+                        <ExternalLinkIcon size={20} />
+                      </a>
+                    </div>
+                  )}
+
+                  {/* Page 2 */}
+                  {activePage === 2 && (
+                    <div className="flex flex-col items-center animate-in fade-in zoom-in duration-500">
+                      <h3 className="text-3xl font-bold text-center mb-8 text-orange-900 bg-orange-100 px-6 py-2 rounded-full inline-block">
+                        סרטון מספר 2: העברת מסלול הלמידה ל - Google Sites
+                      </h3>
+                      
+                      <div className="flex flex-col items-center w-full mb-12">
+                        <div className="w-full max-w-3xl aspect-video rounded-2xl overflow-hidden shadow-xl bg-gray-900 border-4 border-orange-100">
+                          <iframe 
+                            className="w-full h-full" 
+                            src="https://www.youtube.com/embed/jTnru-zSye8" 
+                            title="YouTube video player" 
+                            frameBorder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowFullScreen>
+                          </iframe>
+                        </div>
+                      </div>
+
+                      <h4 className="text-2xl font-semibold mb-4 text-orange-800">דוגמה לאתר - Google Sites</h4>
+                      <p className="text-center text-gray-600 mb-4 max-w-2xl">גוגל סייטס לפעמים חוסם תצוגה מקדימה בתוך אתרים אחרים. מצורפת חלונית תצוגה, ובנוסף קישור ישיר.</p>
+
+                      <div className="w-full max-w-4xl h-[500px] rounded-2xl overflow-hidden shadow-lg border-4 border-orange-200 mb-6 bg-white">
+                        <iframe 
+                          className="w-full h-full" 
+                          src="https://sites.google.com/educ.org.il/maslulemida/%D7%91%D7%99%D7%AA" 
+                          title="Google Sites Example" 
+                          frameBorder="0">
+                        </iframe>
+                      </div>
+                      
+                      <a 
+                        href="https://sites.google.com/educ.org.il/maslulemida/%D7%91%D7%99%D7%AA" 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="inline-flex items-center gap-2 bg-orange-200 hover:bg-orange-300 text-orange-900 font-bold py-3 px-8 rounded-full transition-all shadow-md hover:shadow-lg transform hover:-translate-y-1"
+                      >
+                        <span>פתח את האתר בחלון חדש</span>
+                        <ExternalLinkIcon size={20} />
+                      </a>
+                    </div>
+                  )}
+
+                  {/* Page 3 */}
+                  {activePage === 3 && (
+                    <div className="flex flex-col items-center animate-in fade-in zoom-in duration-500">
+                      <h3 className="text-3xl font-bold text-center mb-8 text-purple-900 bg-purple-100 px-6 py-2 rounded-full inline-block">
+                        סרטון השלישי : העברת מסלול הלמידה ל - Google Slides
+                      </h3>
+                      
+                      <div className="flex flex-col items-center w-full mb-12">
+                        <div className="w-full max-w-3xl aspect-video rounded-2xl overflow-hidden shadow-xl bg-gray-900 border-4 border-purple-100">
+                          <iframe 
+                            className="w-full h-full" 
+                            src="https://www.youtube.com/embed/a0_LXiXmuqg" 
+                            title="YouTube video player" 
+                            frameBorder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowFullScreen>
+                          </iframe>
+                        </div>
+                      </div>
+
+                      <h4 className="text-2xl font-semibold mb-4 text-purple-800">הטמעת המצגת מהסרטון</h4>
+                      
+                      <div className="w-full max-w-4xl aspect-video rounded-2xl overflow-hidden shadow-2xl border-4 border-purple-200 bg-white">
+                        <iframe 
+                          src="https://docs.google.com/presentation/d/e/2PACX-1vTvQhmRXL28BMYHCVzYxONG3vIC2UkT7Vp5OX_LH_Rj4Kn4FMbpYJxhb7IM73jsPGMjTpqusmRBPHYB/pubembed?start=false&loop=false&delayms=3000" 
+                          frameBorder="0" 
+                          className="w-full h-full"
+                          allowFullScreen={true}>
+                        </iframe>
+                      </div>
+                    </div>
+                  )}
+                  
+                </div>
+              </main>
+
+              {/* Footer */}
+              <footer className="container mx-auto mt-12 pb-6 text-center text-gray-700 font-medium">
+                <p>&copy; כל הזכויות שמורות לאריאל קלפנר: טכנופדגוגיה, הערכה, בינה, 050-9540538</p>
+              </footer>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
